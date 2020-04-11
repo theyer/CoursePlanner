@@ -1,0 +1,31 @@
+<!doctype html>
+<html>
+<head>
+  <title>Course Planner</title>
+  <meta charset='utf-8' />
+  <link href='static/style.css' rel='stylesheet' />
+  <!-- Load FullCalendar. -->
+  <link href='static/fullcalendar/core/main.css' rel='stylesheet' />
+  <link href='static/fullcalendar/daygrid/main.css' rel='stylesheet' />
+  <link href='static/fullcalendar/timegrid/main.css' rel='stylesheet' />
+  <script src='static/fullcalendar/core/main.js'></script>
+  <script src='static/fullcalendar/daygrid/main.js'></script>
+  <script src='static/fullcalendar/timegrid/main.js'></script>
+</head>
+<body>
+  <h1 id='title'>Course Planner</h1>
+
+  <div id='calendar'></div>
+  <br>
+  <div id='course_list_container'>
+    <div id='course_list'></div>
+  </div>
+
+  <!-- Load React. -->
+  <!-- Note: when deploying, replace "development.js" with "production.min.js". -->
+  <script src="https://unpkg.com/react@16/umd/react.development.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js" crossorigin></script>
+  <!-- Load app. -->
+  <script src='static/app.js'></script>
+</body>
+</html>
