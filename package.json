@@ -1,10 +1,12 @@
 {
   "name": "CoursePlanner",
   "version": "2.0.0",
-  "description": "**CoursePlanner** is a simple client-side web app intended to assist students plan their upcoming courses. Written by a backend dev and currently in v1, CoursePlanner prioritizes core functionality and features over a polished UI.",
-  "main": "index.js",
+  "description": "**CoursePlanner** is a simple client-side web app intended to assist students plan their upcoming courses.",
+  "main": "index.jsx",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "webpack-dev-server --mode development",
+    "build": "webpack --mode production",
+    "clean": "rm -rf dist"
   },
   "repository": {
     "type": "git",
@@ -18,7 +20,26 @@
   },
   "homepage": "https://github.com/theyer/CoursePlanner#readme",
   "dependencies": {
-    "babel-cli": "^6.26.0",
-    "babel-preset-react-app": "^3.1.2"
+    "@fullcalendar/core": "^4.4.0",
+    "@fullcalendar/daygrid": "^4.4.0",
+    "@fullcalendar/react": "^4.4.0",
+    "@fullcalendar/timegrid": "^4.4.0",
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1",
+    "react-hot-loader": "^4.12.20"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.1.0",
+    "@babel/core": "^7.1.0",
+    "@babel/preset-env": "^7.1.0",
+    "@babel/preset-react": "^7.0.0",
+    "babel-loader": "^8.0.2",
+    "css-loader": "^1.0.0",
+    "node-sass": "^4.13.1",
+    "sass-loader": "^8.0.2",
+    "style-loader": "^0.23.0",
+    "webpack": "^4.42.1",
+    "webpack-cli": "^3.1.1",
+    "webpack-dev-server": "^3.1.8"
   }
 }
