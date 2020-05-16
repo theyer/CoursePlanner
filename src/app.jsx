@@ -74,7 +74,8 @@ class App extends React.Component {
         let courses = [];
         for (let i = 0; i < this.state.courseInfoList.length; i++) {
             let courseInfo = this.state.courseInfoList[i];
-            courses.push(<Course id={'course_' + i}
+            courses.push(<Course key={i}
+                id={'course_' + i}
                 name={courseInfo.name}
                 credits={courseInfo.credits}
                 startTime={courseInfo.startTime}
@@ -85,7 +86,7 @@ class App extends React.Component {
         }
 
         return (
-            <div>
+            <div id="app">
                 <Calendar courses={this.state.courseInfoList} />
                 <br />
                 <div id="course_table_form_container">

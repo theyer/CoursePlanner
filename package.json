@@ -1,5 +1,5 @@
 {
-  "name": "CoursePlanner",
+  "name": "courseplanner",
   "version": "2.0.0",
   "description": "**CoursePlanner** is a simple client-side web app intended to assist students plan their upcoming courses.",
   "main": "index.jsx",
