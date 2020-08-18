@@ -5,6 +5,8 @@ import { hot } from "react-hot-loader";
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
+import APIClient from './apiClient';
+import { CourseInfo, Schedule } from './schema';
 import "./app.scss";
 
 // Start at 1 to match FullCalendar impl.
@@ -19,30 +21,61 @@ const DAYS_MAP = {
 // and https://www.schemecolor.com/ home page.
 const COLORS = ['#3581d8', '#d82e3f', '#ffe135', '#28cc2d', '#63cad8', '#f52394', '#7f00ff', '#c4c4c4'];
 
-class CourseInfo {
-    constructor(name, credits, startTime, endTime, days, isDisplayed) {
-        this.name = name;
-        this.credits = credits;
-        this.startTime = startTime;
-        this.endTime = endTime;
-        this.days = days;
-        this.isDisplayed = isDisplayed;
-    }
-
-    static changeIsDisplayed(courseInfo, isDisplayed) {
-        return new CourseInfo(courseInfo.name, courseInfo.credits, courseInfo.startTime,
-                              courseInfo.endTime, courseInfo.days, isDisplayed);
-    }
-}
-
 
 class App extends React.Component {
     constructor(props) {
         super(props);
-        this.state = { courseInfoList: [], calendarEvents: [] };
+        this.state = { courseInfoList: [], schedules: [] };
         this.addCourse = this.addCourse.bind(this);
         this.handleDisplayChange = this.handleDisplayChange.bind(this);
         this.numCredits = this.numCredits.bind(this);
+        this.submitSchedule = this.submitSchedule.bind(this);
+        this.listAllSchedules = this.listAllSchedules.bind(this);
+        this.loadSchedule = this.loadSchedule.bind(this);
+    }
+
+    /*async*/ componentDidMount() {
+        // const accessToken = await this.props.auth.getAccessToken()
+        const accessToken = '1234';
+        this.apiClient = new APIClient(accessToken);
+        // this.apiClient.getKudos().then((data) =>
+        //   this.setState({...this.state, kudos: data})
+        // );
+    }
+
+    submitSchedule() {
+        let name = 'tims_';
+        for (let courseInfo of this.state.courseInfoList) {
+            name += courseInfo.name
+        }
+        const schedule = new Schedule(name, this.state.courseInfoList);
+        this.apiClient.createSchedule(schedule).then((resp) => {
+            console.log(resp);
+        });
+    }
+
+    listAllSchedules() {
+        this.apiClient.getSchedules().then((all_schedules) => {
+            console.log('apollo');
+            console.log(all_schedules);
+            let schedules = [];
+            for (let schedule of all_schedules) {
+                let courseInfoList = [];
+                for (let course of schedule.courseList) {
+                    courseInfoList.push(new CourseInfo(course.name, course.credits, course.startTime, course.endTime, course.days, course.isDisplayed));
+                }
+                let s = new Schedule(schedule.name, courseInfoList);
+                console.log(s);
+                schedules.push(s);
+            }
+            console.log(schedules);
+            this.setState({ schedules: schedules });
+        });
+    }
+
+    loadSchedule(schedule, e) {
+        e.preventDefault();
+        this.setState({ courseInfoList: schedule.courseList });
     }
 
     handleDisplayChange(e) {
@@ -93,6 +126,11 @@ class App extends React.Component {
                     <CourseTable courses={courses} numCredits={this.numCredits()} />
                     <NewCourseForm handleSubmit={this.addCourse} />
                 </div>
+                <button onClick={this.submitSchedule}>Save Schedule</button>
+                <button onClick={this.listAllSchedules}>List Saved Schedules</button>
+                <ul>
+                    {this.state.schedules.map(s => (<li><a href="#" onClick={(e) => this.loadSchedule(s, e)}>{s.name}</a></li>))}
+                </ul>
             </div>
         );
     }
