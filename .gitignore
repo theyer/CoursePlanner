@@ -1,2 +1,7 @@
 node_modules
-dist
+public/dist
+venv
+.firebase*
+firebase.json
+firestore.rules
+firestore.indexes.json

@@ -1,80 +1,93 @@
-// TODO: assert course names are unique.
-
 import React from "react";
 import { hot } from "react-hot-loader";
-import FullCalendar from '@fullcalendar/react';
-import dayGridPlugin from '@fullcalendar/daygrid';
-import timeGridPlugin from '@fullcalendar/timegrid';
-import APIClient from './apiClient';
-import { CourseInfo, Schedule } from './schema';
+import CssBaseline from '@material-ui/core/CssBaseline';
+import Calendar from './components/calendar'
+import MenuAppBar from './components/appbar';
+import { DAYS_MAP } from './constants/calendarData';
+import { CourseInfo, Schedule, scheduleConverter } from './schema';
+import firebase, { auth, provider } from './components/Firebase/firebase';
 import "./app.scss";
-
-// Start at 1 to match FullCalendar impl.
-const DAYS_MAP = {
-    'monday': 1,
-    'tuesday': 2,
-    'wednesday': 3,
-    'thursday': 4,
-    'friday': 5
-};
-// From https://www.schemecolor.com/blue-red-yellow-green.php
-// and https://www.schemecolor.com/ home page.
-const COLORS = ['#3581d8', '#d82e3f', '#ffe135', '#28cc2d', '#63cad8', '#f52394', '#7f00ff', '#c4c4c4'];
 
 
 class App extends React.Component {
     constructor(props) {
         super(props);
-        this.state = { courseInfoList: [], schedules: [] };
+        this.state = {
+            courseInfoList: [],
+            schedules: [],
+            scheduleId: '',
+            user: null
+        };
+        this.db = firebase.firestore().collection('schedules');
+
+        this.login = this.login.bind(this);
+        this.logout = this.logout.bind(this);
+        this.getSavedSchedules = this.getSavedSchedules.bind(this);
         this.addCourse = this.addCourse.bind(this);
         this.handleDisplayChange = this.handleDisplayChange.bind(this);
         this.numCredits = this.numCredits.bind(this);
         this.submitSchedule = this.submitSchedule.bind(this);
-        this.listAllSchedules = this.listAllSchedules.bind(this);
+        this.newSchedule = this.newSchedule.bind(this);
         this.loadSchedule = this.loadSchedule.bind(this);
     }
 
-    /*async*/ componentDidMount() {
-        // const accessToken = await this.props.auth.getAccessToken()
-        const accessToken = '1234';
-        this.apiClient = new APIClient(accessToken);
-        // this.apiClient.getKudos().then((data) =>
-        //   this.setState({...this.state, kudos: data})
-        // );
-    }
-
-    submitSchedule() {
-        let name = 'tims_';
-        for (let courseInfo of this.state.courseInfoList) {
-            name += courseInfo.name
-        }
-        const schedule = new Schedule(name, this.state.courseInfoList);
-        this.apiClient.createSchedule(schedule).then((resp) => {
-            console.log(resp);
-        });
-    }
-
-    listAllSchedules() {
-        this.apiClient.getSchedules().then((all_schedules) => {
-            console.log('apollo');
-            console.log(all_schedules);
-            let schedules = [];
-            for (let schedule of all_schedules) {
-                let courseInfoList = [];
-                for (let course of schedule.courseList) {
-                    courseInfoList.push(new CourseInfo(course.name, course.credits, course.startTime, course.endTime, course.days, course.isDisplayed));
-                }
-                let s = new Schedule(schedule.name, courseInfoList);
-                console.log(s);
-                schedules.push(s);
+    componentDidMount() {
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                this.setState({ user: user });
+                this.getSavedSchedules();
             }
-            console.log(schedules);
-            this.setState({ schedules: schedules });
         });
     }
 
-    loadSchedule(schedule, e) {
-        e.preventDefault();
+    getSavedSchedules() {
+        this.unsubscribe = this.db
+            .withConverter(scheduleConverter)
+            .where("uid", "==", this.state.user.uid)
+            .orderBy("name")
+            .onSnapshot(querySnapshot => {
+                const schedules = querySnapshot.docs.map(doc => {
+                    return doc.data();
+                });
+                this.setState({ schedules: schedules });
+            });
+    }
+
+    login() {
+        auth.signInWithPopup(provider)
+            .then(result => {
+                this.setState({ user: result.user });
+            })
+            .catch(error => {
+                console.error("Login error: ", error);
+            });
+    }
+
+    logout() {
+        auth.signOut()
+            .then(() => {
+                this.unsubscribe();
+                this.setState({ user: null, schedules: [], scheduleId: '' });
+            });
+    }
+
+    submitSchedule(scheduleName) {
+        if (!this.state.user) { return; }
+        const schedule = new Schedule(
+            scheduleName, this.state.user.uid, this.state.courseInfoList);
+        this.db.withConverter(scheduleConverter).add(schedule)
+            .then(docRef => {
+                this.setState({ scheduleId: docRef.id });
+            }).catch(error => {
+                console.error("Error adding schedule: ", error);
+            });
+    }
+
+    newSchedule() {
+        this.setState({ courseInfoList: [], scheduleId: ''});
+    }
+
+    loadSchedule(schedule) {
         this.setState({ courseInfoList: schedule.courseList });
     }
 
@@ -104,78 +117,43 @@ class App extends React.Component {
     }
 
     render() {
-        let courses = [];
+        let courseRows = [];
         for (let i = 0; i < this.state.courseInfoList.length; i++) {
             let courseInfo = this.state.courseInfoList[i];
-            courses.push(<Course key={i}
-                id={'course_' + i}
-                name={courseInfo.name}
-                credits={courseInfo.credits}
-                startTime={courseInfo.startTime}
-                endTime={courseInfo.endTime}
-                days={courseInfo.days}
-                isDisplayed={courseInfo.isDisplayed}
-                handleDisplayChange={this.handleDisplayChange} />)
+            courseRows.push(
+                <CourseRow
+                    key={i}
+                    id={'course_' + i}
+                    name={courseInfo.name}
+                    credits={courseInfo.credits}
+                    startTime={courseInfo.startTime}
+                    endTime={courseInfo.endTime}
+                    days={courseInfo.days}
+                    isDisplayed={courseInfo.isDisplayed}
+                    handleDisplayChange={this.handleDisplayChange}
+                />
+            );
         }
 
         return (
             <div id="app">
+                <CssBaseline />
+                <MenuAppBar
+                    schedules={this.state.schedules}
+                    user={this.state.user}
+                    login={this.login}
+                    logout={this.logout}
+                    handleNew={this.newSchedule}
+                    handleSave={this.submitSchedule}
+                    handleOpen={this.loadSchedule}
+                />
+                <br />
                 <Calendar courses={this.state.courseInfoList} />
                 <br />
                 <div id="course_table_form_container">
-                    <CourseTable courses={courses} numCredits={this.numCredits()} />
+                    <CourseTable courseRows={courseRows} numCredits={this.numCredits()} />
                     <NewCourseForm handleSubmit={this.addCourse} />
                 </div>
-                <button onClick={this.submitSchedule}>Save Schedule</button>
-                <button onClick={this.listAllSchedules}>List Saved Schedules</button>
-                <ul>
-                    {this.state.schedules.map(s => (<li><a href="#" onClick={(e) => this.loadSchedule(s, e)}>{s.name}</a></li>))}
-                </ul>
-            </div>
-        );
-    }
-}
-
-class Calendar extends React.Component {
-    constructor(props) {
-        super(props);
-    }
-
-    render() {
-        let events = [];
-        for (let i = 0; i < this.props.courses.length; i++) {
-            const courseInfo = this.props.courses[i];
-            if (!courseInfo.isDisplayed) {
-                continue;
-            }
-            const colorIndex = i % COLORS.length;
-            events.push({
-                id: courseInfo.name + "_CalendarEvent",
-                title: courseInfo.name,
-                startTime: courseInfo.startTime,
-                endTime: courseInfo.endTime,
-                daysOfWeek: courseInfo.days,
-                color: COLORS[colorIndex]
-            });
-        }
-
-        return (
-            <div id="calendar">
-                <FullCalendar defaultView="timeGridWeek"
-                    plugins={[dayGridPlugin, timeGridPlugin]}
-                    header={false}
-                    footer={false}
-                    aspectRatio="1.5"
-                    height="auto"
-                    columnHeaderFormat={{ weekday: 'long' }}
-                    allDaySlot={false}
-                    // TODO: set min/max dynamically?
-                    minTime="07:00:00"
-                    maxTime="19:00:00"
-                    // Set "today" to a weekend then hide weekends to avoid highlighting today.
-                    now="2020-04-05"
-                    weekends={false}
-                    events={events} />
             </div>
         );
     }
@@ -279,7 +257,7 @@ class CourseTable extends React.Component {
     }
 
     render() {
-        if (this.props.courses.length === 0) {
+        if (this.props.courseRows.length === 0) {
             return null;
         }
         return (
@@ -296,7 +274,7 @@ class CourseTable extends React.Component {
                         </tr>
                     </thead>
                     <tbody>
-                        {this.props.courses}
+                        {this.props.courseRows}
                         <tr className="course_row">
                             <td colSpan="6">Credits: {this.props.numCredits}</td>
                         </tr>
@@ -307,7 +285,7 @@ class CourseTable extends React.Component {
     }
 }
 
-class Course extends React.Component {
+class CourseRow extends React.Component {
     constructor(props) {
         super(props);
         this.handleDaysChange = this.handleDaysChange.bind(this);
