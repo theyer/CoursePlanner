@@ -1,21 +1,24 @@
-# CoursePlanner (v2)
+# CoursePlanner (v3)
 
-**CoursePlanner** is a simple client-side web app intended to assist students plan their upcoming courses. Written by a backend dev as a COVID-19 stay-at-home project, CoursePlanner prioritizes core functionality and features over a polished UI. Rewritten in React for v2, the business logic is cleaner, more functional, and more extensible than before. However, I have yet to find the motivation to dive down the CSS rabbit hole, so the UI remains minimal.
+**CoursePlanner** is a simple client-side web app intended to assist students plan their upcoming courses. Written by a backend dev as a COVID-19 stay-at-home project, CoursePlanner prioritizes core functionality and features over a polished UI. Rewritten in React for v2 and integrated with Firebase for v3, the business logic is cleaner, more functional, and more extensible than before. V3 also introduces material-ui to the app improving the previously bland, manually styled UI.
 
 ## Features
 
 - Visualize courses on a weekday calendar.
 - Toggle course visualization on/off to experiment with course combinations.
 - View running total of course credit hours for currently visualized courses.
+- Login and save schedules for later viewing/editing.
 
 ## Upcoming work
 
-With the React rewrite, I feel content with the cleanliness and functionality of the code. I don't expect to put much more work into this project as it does the things I want it to, but the areas I think could be improved include:
+Adding Firestore to save schedules addressed one of the largest missing components of this app and makes it far more functional. The UI is the biggest area for further improvement but I'll likely be limited by my lack of CSS knowledge soon. Some ideas:
 
-- Integrate a UI-focused CSS lib (Bootstrap perhaps?).
-- Actually make things look nice once the CSS lib is in place.
-- Somehow someday find a way to create some non-contrived server-side functionality.
+- Learn more JS best practices and clean up the codebase.
+- Improve support on mobile.
+- Add material-ui throughout the app.
+- Add a dedicated login page and add additional login providers.
+- Optimize webpack bundles.
 
 ## Deployment
 
-CoursePlanner is currently hosted as a static website in Google Cloud Storage and can be accessed at http://www.freecourseplanner.com.
+CoursePlanner is currently hosted via Google's Firebase and can be accessed at http://www.freecourseplanner.com.
