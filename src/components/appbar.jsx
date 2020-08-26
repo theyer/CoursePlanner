@@ -112,8 +112,14 @@ function SaveButton(props) {
   const [scheduleName, setScheduleName] = React.useState('');
   const [anchorEl, setAnchorEl] = React.useState(null);
 
-  const openPopover = (event) => {
-    setAnchorEl(event.currentTarget);
+  const openPopoverOrUpdateSchedule = (event) => {
+    if (props.isSavedSchedule) {
+      // Update schedule instead of opening popover.
+      props.handleUpdate();
+    } else {
+      // Schedule is new, open popover.
+      setAnchorEl(event.currentTarget);
+    }
   };
 
   const closePopover = () => {
@@ -134,7 +140,11 @@ function SaveButton(props) {
     <React.Fragment>
       <Tooltip title="Save">
         <span>
-          <IconButton color="inherit" onClick={openPopover} disabled={props.disabled}>
+          <IconButton
+            color="inherit"
+            onClick={openPopoverOrUpdateSchedule}
+            disabled={props.disabled}
+          >
             <SaveIcon />
           </IconButton>
         </span>
@@ -192,7 +202,11 @@ export default function MenuAppBar(props) {
             handleDelete={props.handleDelete}
             disabled={!props.user}
           />
-          <SaveButton handleSave={props.handleSave} disabled={!props.user} />
+          <SaveButton
+            isSavedSchedule={props.isSavedSchedule}
+            handleSave={props.handleSave}
+            handleUpdate={props.handleUpdate}
+            disabled={!props.user} />
           {props.user ?
             <Button color="inherit" onClick={props.logout}>Logout</Button> :
             <Button color="inherit" onClick={props.login}>Login</Button>

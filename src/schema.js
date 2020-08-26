@@ -12,6 +12,17 @@ export class CourseInfo {
       return new CourseInfo(courseInfo.name, courseInfo.credits, courseInfo.startTime,
                             courseInfo.endTime, courseInfo.days, isDisplayed);
   }
+
+  toData() {
+    return {
+      name: this.name,
+      credits: this.credits,
+      startTime: this.startTime,
+      endTime: this.endTime,
+      days: this.days,
+      isDisplayed: this.isDisplayed
+    };
+  }
 }
 
 export class Schedule {
@@ -28,16 +39,9 @@ export const buildScheduleData = (name, uid, courseInfoList) => {
     name: name,
     uid: uid,
     courseList: courseInfoList.map(courseInfo => {
-      return {
-        name: courseInfo.name,
-        credits: courseInfo.credits,
-        startTime: courseInfo.startTime,
-        endTime: courseInfo.endTime,
-        days: courseInfo.days,
-        isDisplayed: courseInfo.isDisplayed
-      }
+      return courseInfo.toData();
     })
-  }
+  };
 }
 
 // Defines how to create Schedule class from Firestore data.
