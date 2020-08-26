@@ -28,6 +28,7 @@ class App extends React.Component {
         this.handleDisplayChange = this.handleDisplayChange.bind(this);
         this.numCredits = this.numCredits.bind(this);
         this.submitSchedule = this.submitSchedule.bind(this);
+        this.updateCurrentSchedule = this.updateCurrentSchedule.bind(this);
         this.deleteSchedule = this.deleteSchedule.bind(this);
         this.clearSchedule = this.clearSchedule.bind(this);
         this.loadSchedule = this.loadSchedule.bind(this);
@@ -84,6 +85,21 @@ class App extends React.Component {
         });
     }
 
+    updateCurrentSchedule() {
+        if (!this.state.user) { return; }
+        if (!this.state.scheduleId) {
+            console.error("Error updating schedule: missing scheduleId.");
+            return;
+        }
+        this.db.doc(this.state.scheduleId).update({
+            courseList: this.state.courseInfoList.map(courseInfo => {
+                return courseInfo.toData();
+            })
+        }).catch(error => {
+            console.error("Error updating schedule: ", error);
+        });
+    }
+
     deleteSchedule(schedule) {
         if (!this.state.user) { return; }
         const id = schedule.id;
@@ -101,7 +117,10 @@ class App extends React.Component {
     }
 
     loadSchedule(schedule) {
-        this.setState({ courseInfoList: schedule.courseList });
+        this.setState({
+            courseInfoList: schedule.courseList,
+            scheduleId: schedule.id
+        });
     }
 
     handleDisplayChange(e) {
@@ -152,12 +171,14 @@ class App extends React.Component {
             <div id="app">
                 <CssBaseline />
                 <MenuAppBar
+                    isSavedSchedule={Boolean(this.state.scheduleId)}
                     schedules={this.state.schedules}
                     user={this.state.user}
                     login={this.login}
                     logout={this.logout}
                     handleClear={this.clearSchedule}
                     handleSave={this.submitSchedule}
+                    handleUpdate={this.updateCurrentSchedule}
                     handleOpen={this.loadSchedule}
                     handleDelete={this.deleteSchedule}
                 />
