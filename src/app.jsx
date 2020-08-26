@@ -29,7 +29,7 @@ class App extends React.Component {
         this.numCredits = this.numCredits.bind(this);
         this.submitSchedule = this.submitSchedule.bind(this);
         this.deleteSchedule = this.deleteSchedule.bind(this);
-        this.newSchedule = this.newSchedule.bind(this);
+        this.clearSchedule = this.clearSchedule.bind(this);
         this.loadSchedule = this.loadSchedule.bind(this);
     }
 
@@ -96,7 +96,7 @@ class App extends React.Component {
         });
     }
 
-    newSchedule() {
+    clearSchedule() {
         this.setState({ courseInfoList: [], scheduleId: ''});
     }
 
@@ -156,7 +156,7 @@ class App extends React.Component {
                     user={this.state.user}
                     login={this.login}
                     logout={this.logout}
-                    handleNew={this.newSchedule}
+                    handleClear={this.clearSchedule}
                     handleSave={this.submitSchedule}
                     handleOpen={this.loadSchedule}
                     handleDelete={this.deleteSchedule}

@@ -4,7 +4,7 @@ import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import Tooltip from '@material-ui/core/Tooltip';
 import Typography from '@material-ui/core/Typography';
-import CreateIcon from '@material-ui/icons/Create';
+import ClearIcon from '@material-ui/icons/Clear';
 import FolderOpenIcon from '@material-ui/icons/FolderOpen';
 import SaveIcon from '@material-ui/icons/Save';
 import IconButton from '@material-ui/core/IconButton';
@@ -45,11 +45,11 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function NewButton(props) {
+function ClearButton(props) {
   return (
-    <Tooltip title="New">
-      <IconButton color="inherit" onClick={props.handleNew}>
-        <CreateIcon />
+    <Tooltip title="Clear schedule">
+      <IconButton color="inherit" onClick={props.handleClear}>
+        <ClearIcon />
       </IconButton>
     </Tooltip>
   );
@@ -185,7 +185,7 @@ export default function MenuAppBar(props) {
           <Typography variant="h6" className={classes.title}>
             Course Planner
           </Typography>
-          <NewButton handleNew={props.handleNew} />
+          <ClearButton handleClear={props.handleClear} />
           <OpenButton
             schedules={props.schedules}
             handleOpen={props.handleOpen}
