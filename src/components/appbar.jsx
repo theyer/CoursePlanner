@@ -13,7 +13,6 @@ import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
 import Popover from '@material-ui/core/Popover';
 import ScheduleList from './scheduleList';
-import { processScopedUiProps } from '@fullcalendar/core';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -29,10 +28,6 @@ const useStyles = makeStyles((theme) => ({
     flexGrow: 1,
   },
   popoverForm: {
-    // display: 'block',
-    // '& > *': {
-    //   // margin: theme.spacing(1),
-    // }
     height: '100%',
     display: 'flex',
     alignItems: 'center',
@@ -71,7 +66,7 @@ function OpenButton(props) {
     setAnchorEl(null);
   };
 
-  const handleClick = (schedule) => {
+  const handleOpen = (schedule) => {
     props.handleOpen(schedule);
     closePopover();
   }
@@ -104,7 +99,8 @@ function OpenButton(props) {
       >
         <ScheduleList
           schedules={props.schedules}
-          handleClick={handleClick}
+          handleOpen={handleOpen}
+          handleDelete={props.handleDelete}
         />
       </Popover>
     </React.Fragment>
@@ -190,7 +186,12 @@ export default function MenuAppBar(props) {
             Course Planner
           </Typography>
           <NewButton handleNew={props.handleNew} />
-          <OpenButton schedules={props.schedules} handleOpen={props.handleOpen} disabled={!props.user} />
+          <OpenButton
+            schedules={props.schedules}
+            handleOpen={props.handleOpen}
+            handleDelete={props.handleDelete}
+            disabled={!props.user}
+          />
           <SaveButton handleSave={props.handleSave} disabled={!props.user} />
           {props.user ?
             <Button color="inherit" onClick={props.logout}>Logout</Button> :
