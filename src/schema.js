@@ -15,35 +15,38 @@ export class CourseInfo {
 }
 
 export class Schedule {
-  constructor(name, uid, courseList) {
+  constructor(name, id, uid, courseList) {
       this.name = name;
+      this.id = id;
       this.uid = uid;
       this.courseList = courseList;
   }
 }
 
-// Defines how to convert Schedule class to/from a simple dict.
+export const buildScheduleData = (name, uid, courseInfoList) => {
+  return {
+    name: name,
+    uid: uid,
+    courseList: courseInfoList.map(courseInfo => {
+      return {
+        name: courseInfo.name,
+        credits: courseInfo.credits,
+        startTime: courseInfo.startTime,
+        endTime: courseInfo.endTime,
+        days: courseInfo.days,
+        isDisplayed: courseInfo.isDisplayed
+      }
+    })
+  }
+}
+
+// Defines how to create Schedule class from Firestore data.
 export const scheduleConverter = {
-  toFirestore: schedule => {
-    return {
-      name: schedule.name,
-      uid: schedule.uid,
-      courseList: schedule.courseList.map(courseInfo => {
-        return {
-          name: courseInfo.name,
-          credits: courseInfo.credits,
-          startTime: courseInfo.startTime,
-          endTime: courseInfo.endTime,
-          days: courseInfo.days,
-          isDisplayed: courseInfo.isDisplayed
-        }
-      })
-    }
-  },
   fromFirestore: (snapshot, options) => {
     const data = snapshot.data(options);
     return new Schedule(
       data.name,
+      snapshot.id,
       data.uid,
       data.courseList.map(info => {
         return new CourseInfo(

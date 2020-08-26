@@ -4,7 +4,8 @@ import CssBaseline from '@material-ui/core/CssBaseline';
 import Calendar from './components/calendar'
 import MenuAppBar from './components/appbar';
 import { DAYS_MAP } from './constants/calendarData';
-import { CourseInfo, Schedule, scheduleConverter } from './schema';
+import { CourseInfo } from './schema';
+import { buildScheduleData, scheduleConverter } from './schema';
 import firebase, { auth, provider } from './components/Firebase/firebase';
 import "./app.scss";
 
@@ -27,6 +28,7 @@ class App extends React.Component {
         this.handleDisplayChange = this.handleDisplayChange.bind(this);
         this.numCredits = this.numCredits.bind(this);
         this.submitSchedule = this.submitSchedule.bind(this);
+        this.deleteSchedule = this.deleteSchedule.bind(this);
         this.newSchedule = this.newSchedule.bind(this);
         this.loadSchedule = this.loadSchedule.bind(this);
     }
@@ -73,14 +75,25 @@ class App extends React.Component {
 
     submitSchedule(scheduleName) {
         if (!this.state.user) { return; }
-        const schedule = new Schedule(
+        const scheduleData = buildScheduleData(
             scheduleName, this.state.user.uid, this.state.courseInfoList);
-        this.db.withConverter(scheduleConverter).add(schedule)
-            .then(docRef => {
-                this.setState({ scheduleId: docRef.id });
-            }).catch(error => {
-                console.error("Error adding schedule: ", error);
-            });
+        this.db.add(scheduleData).then(docRef => {
+            this.setState({ scheduleId: docRef.id });
+        }).catch(error => {
+            console.error("Error adding schedule: ", error);
+        });
+    }
+
+    deleteSchedule(schedule) {
+        if (!this.state.user) { return; }
+        const id = schedule.id;
+        this.db.doc(id).delete().then(() => {
+            if (this.state.scheduleId === id) {
+                this.setState({ scheduleId: '' });
+            }
+        }).catch(error => {
+            console.error("Error deleting schedule: ", error);
+        });
     }
 
     newSchedule() {
@@ -146,6 +159,7 @@ class App extends React.Component {
                     handleNew={this.newSchedule}
                     handleSave={this.submitSchedule}
                     handleOpen={this.loadSchedule}
+                    handleDelete={this.deleteSchedule}
                 />
                 <br />
                 <Calendar courses={this.state.courseInfoList} />
