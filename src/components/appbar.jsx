@@ -27,6 +27,7 @@ const useStyles = makeStyles((theme) => ({
   },
   title: {
     flexGrow: 1,
+    // marginLeft: theme.spacing(2),
   },
   popoverForm: {
     height: '100%',
@@ -228,13 +229,9 @@ export default function MenuAppBar(props) {
     <div className={classes.root}>
       <AppBar position="sticky" className={classes.appBar}>
         <Toolbar>
-          <IconButton edge="start" className={classes.menuButton} color="inherit" aria-label="menu">
-            <MenuIcon />
-          </IconButton>
           <Typography variant="h6" className={classes.title}>
             Course Planner
           </Typography>
-          <ClearButton handleClear={props.handleClear} />
           <OpenButton
             schedules={props.schedules}
             handleOpen={props.handleOpen}
@@ -247,6 +244,7 @@ export default function MenuAppBar(props) {
             handleUpdate={props.handleUpdate}
             disabled={!props.user}
           />
+          <ClearButton handleClear={props.handleClear} />
           {props.user ?
             <Button color="inherit" onClick={props.logout}>Logout</Button> :
             <Button color="inherit" onClick={props.login}>Login</Button>
