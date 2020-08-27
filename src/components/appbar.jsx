@@ -13,6 +13,7 @@ import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
 import Popover from '@material-ui/core/Popover';
 import ScheduleList from './scheduleList';
+import Notification from './notification';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -57,6 +58,7 @@ function ClearButton(props) {
 
 function OpenButton(props) {
   const [anchorEl, setAnchorEl] = React.useState(null);
+  const [isNotificationOpen, setIsNotificationOpen] = React.useState(false);
 
   const openPopover = (event) => {
     setAnchorEl(event.currentTarget);
@@ -66,13 +68,27 @@ function OpenButton(props) {
     setAnchorEl(null);
   };
 
+  const openNotification = () => {
+    setIsNotificationOpen(true);
+  }
+
+  const closeNotification = () => {
+    setIsNotificationOpen(false);
+  }
+
   const handleOpen = (schedule) => {
     props.handleOpen(schedule);
     closePopover();
   }
 
-  const open = Boolean(anchorEl);
-  const popoverId = open ? 'open-popover' : undefined;
+  const handleDelete = (schedule) => {
+    props.handleDelete(schedule).then(() => {
+      openNotification();
+    });
+  }
+
+  const isPopoverOpen = Boolean(anchorEl);
+  const popoverId = isPopoverOpen ? 'open-popover' : undefined;
 
   return (
     <React.Fragment>
@@ -85,7 +101,7 @@ function OpenButton(props) {
       </Tooltip>
       <Popover
         id={popoverId}
-        open={open}
+        open={isPopoverOpen}
         anchorEl={anchorEl}
         onClose={closePopover}
         anchorOrigin={{
@@ -100,9 +116,14 @@ function OpenButton(props) {
         <ScheduleList
           schedules={props.schedules}
           handleOpen={handleOpen}
-          handleDelete={props.handleDelete}
+          handleDelete={handleDelete}
         />
       </Popover>
+      <Notification 
+        open={isNotificationOpen}
+        closeNotification={closeNotification}
+        message="Schedule deleted."
+      />
     </React.Fragment>
   );
 }
@@ -111,11 +132,14 @@ function SaveButton(props) {
   const classes = useStyles();
   const [scheduleName, setScheduleName] = React.useState('');
   const [anchorEl, setAnchorEl] = React.useState(null);
+  const [isNotificationOpen, setIsNotificationOpen] = React.useState(false);
 
   const openPopoverOrUpdateSchedule = (event) => {
     if (props.isSavedSchedule) {
       // Update schedule instead of opening popover.
-      props.handleUpdate();
+      props.handleUpdate().then(() => {
+        openNotification();
+      });
     } else {
       // Schedule is new, open popover.
       setAnchorEl(event.currentTarget);
@@ -126,15 +150,25 @@ function SaveButton(props) {
     setAnchorEl(null);
   };
 
+  const openNotification = () => {
+    setIsNotificationOpen(true);
+  }
+
+  const closeNotification = () => {
+    setIsNotificationOpen(false);
+  }
+
   const handleSubmit = (e) => {
     e.preventDefault();
     closePopover();
-    props.handleSave(scheduleName);
+    props.handleSave(scheduleName).then(() => {
+      openNotification();
+    });
     setScheduleName('');
   }
 
-  const open = Boolean(anchorEl);
-  const popoverId = open ? 'save-popover' : undefined;
+  const isPopoverOpen = Boolean(anchorEl);
+  const popoverId = isPopoverOpen ? 'save-popover' : undefined;
 
   return (
     <React.Fragment>
@@ -151,7 +185,7 @@ function SaveButton(props) {
       </Tooltip>
       <Popover
         id={popoverId}
-        open={open}
+        open={isPopoverOpen}
         anchorEl={anchorEl}
         onClose={closePopover}
         anchorOrigin={{
@@ -178,6 +212,11 @@ function SaveButton(props) {
           <Button variant="contained" type="submit" className={classes.submitButton}>Save</Button>
         </form>
       </Popover>
+      <Notification
+        open={isNotificationOpen}
+        closeNotification={closeNotification}
+        message="Schedule saved."
+      />
     </React.Fragment>
   );
 }
@@ -206,7 +245,8 @@ export default function MenuAppBar(props) {
             isSavedSchedule={props.isSavedSchedule}
             handleSave={props.handleSave}
             handleUpdate={props.handleUpdate}
-            disabled={!props.user} />
+            disabled={!props.user}
+          />
           {props.user ?
             <Button color="inherit" onClick={props.logout}>Logout</Button> :
             <Button color="inherit" onClick={props.login}>Login</Button>
