@@ -74,24 +74,24 @@ class App extends React.Component {
             });
     }
 
-    submitSchedule(scheduleName) {
+    async submitSchedule(scheduleName) {
         if (!this.state.user) { return; }
         const scheduleData = buildScheduleData(
             scheduleName, this.state.user.uid, this.state.courseInfoList);
-        this.db.add(scheduleData).then(docRef => {
+        return this.db.add(scheduleData).then(docRef => {
             this.setState({ scheduleId: docRef.id });
         }).catch(error => {
             console.error("Error adding schedule: ", error);
         });
     }
 
-    updateCurrentSchedule() {
+    async updateCurrentSchedule() {
         if (!this.state.user) { return; }
         if (!this.state.scheduleId) {
             console.error("Error updating schedule: missing scheduleId.");
             return;
         }
-        this.db.doc(this.state.scheduleId).update({
+        return this.db.doc(this.state.scheduleId).update({
             courseList: this.state.courseInfoList.map(courseInfo => {
                 return courseInfo.toData();
             })
@@ -100,10 +100,10 @@ class App extends React.Component {
         });
     }
 
-    deleteSchedule(schedule) {
+    async deleteSchedule(schedule) {
         if (!this.state.user) { return; }
         const id = schedule.id;
-        this.db.doc(id).delete().then(() => {
+        return this.db.doc(id).delete().then(() => {
             if (this.state.scheduleId === id) {
                 this.setState({ scheduleId: '' });
             }
