@@ -3,6 +3,8 @@ import { hot } from "react-hot-loader";
 import CssBaseline from '@material-ui/core/CssBaseline';
 import Calendar from './components/calendar'
 import MenuAppBar from './components/appbar';
+import CourseTable from './components/courseTable';
+import DaysOfTheWeek, { Checkbox } from './components/daysOfTheWeek';
 import { DAYS_MAP } from './constants/calendarData';
 import { CourseInfo } from './schema';
 import { buildScheduleData, scheduleConverter } from './schema';
@@ -149,24 +151,6 @@ class App extends React.Component {
     }
 
     render() {
-        let courseRows = [];
-        for (let i = 0; i < this.state.courseInfoList.length; i++) {
-            let courseInfo = this.state.courseInfoList[i];
-            courseRows.push(
-                <CourseRow
-                    key={i}
-                    id={'course_' + i}
-                    name={courseInfo.name}
-                    credits={courseInfo.credits}
-                    startTime={courseInfo.startTime}
-                    endTime={courseInfo.endTime}
-                    days={courseInfo.days}
-                    isDisplayed={courseInfo.isDisplayed}
-                    handleDisplayChange={this.handleDisplayChange}
-                />
-            );
-        }
-
         return (
             <div id="app">
                 <CssBaseline />
@@ -186,7 +170,11 @@ class App extends React.Component {
                 <Calendar courses={this.state.courseInfoList} />
                 <br />
                 <div id="course_table_form_container">
-                    <CourseTable courseRows={courseRows} numCredits={this.numCredits()} />
+                    <CourseTable
+                        courseInfoList={this.state.courseInfoList}
+                        numCredits={this.numCredits()}
+                        handleDisplayChange={this.handleDisplayChange}
+                    />
                     <NewCourseForm handleSubmit={this.addCourse} />
                 </div>
             </div>
@@ -282,124 +270,6 @@ class NewCourseForm extends React.Component {
                     </p>
                 </fieldset>
             </form>
-        );
-    }
-}
-
-class CourseTable extends React.Component {
-    constructor(props) {
-        super(props);
-    }
-
-    render() {
-        if (this.props.courseRows.length === 0) {
-            return null;
-        }
-        return (
-            <div id="course_table_container">
-                <table id="course_table">
-                    <thead>
-                        <tr className="course_row">
-                            <th>Displayed</th>
-                            <th>Course Name</th>
-                            <th>Credits</th>
-                            <th>Start Time</th>
-                            <th>End Time</th>
-                            <th>Days</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {this.props.courseRows}
-                        <tr className="course_row">
-                            <td colSpan="6">Credits: {this.props.numCredits}</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        );
-    }
-}
-
-class CourseRow extends React.Component {
-    constructor(props) {
-        super(props);
-        this.handleDaysChange = this.handleDaysChange.bind(this);
-    }
-
-    handleDaysChange(e) {
-        // Do nothing. Days in a course are immutable (for now).
-        return;
-    }
-
-    render() {
-        return (
-            <tr className="course_row">
-                <td><Checkbox id={this.props.id + '_isDisplayed'}
-                              checked={this.props.isDisplayed}
-                              disabled={false}
-                              handleChange={this.props.handleDisplayChange} /></td>
-                <td>{this.props.name}</td>
-                <td>{this.props.credits}</td>
-                <td>{this.props.startTime}</td>
-                <td>{this.props.endTime}</td>
-                <td><DaysOfTheWeek idPrefix={this.props.name}
-                                   days={this.props.days}
-                                   disabled={true}
-                                   handleChange={this.handleDaysChange} /></td>
-            </tr>
-        );
-    }
-}
-
-class DaysOfTheWeek extends React.Component {
-    constructor(props) {
-        super(props);
-        this.buildLabeledCheckbox = this.buildLabeledCheckbox.bind(this);
-    }
-
-    buildLabeledCheckbox(day, label) {
-        return (
-            <span key={this.props.idPrefix + "_" + day}>
-                <Checkbox id={this.props.idPrefix + "_" + day}
-                          name={day}
-                          checked={this.props.days.includes(DAYS_MAP[day])}
-                          disabled={this.props.disabled} 
-                          handleChange={this.props.handleChange} />
-                <label htmlFor={this.props.idPrefix + "_" + day}>{label}</label>
-            </span>
-        );
-    }
-
-    render() {
-        const dayLabels = [
-            ['monday', 'M'],
-            ['tuesday', 'T'],
-            ['wednesday', 'W'],
-            ['thursday', 'Th'],
-            ['friday', 'F']
-        ];
-        return (
-            <div id={this.props.idPrefix + "_DaysOfTheWeek"}>
-                {dayLabels.map(dayLabel => this.buildLabeledCheckbox(dayLabel[0], dayLabel[1]))}
-            </div>
-        );
-    }
-}
-
-class Checkbox extends React.Component {
-    constructor(props) {
-        super(props);
-    }
-
-    render() {
-        return (
-            <input id={this.props.id}
-                   name={this.props.name}
-                   type="checkbox"
-                   disabled={this.props.disabled}
-                   checked={this.props.checked}
-                   onChange={this.props.handleChange}>
-            </input>
         );
     }
 }
