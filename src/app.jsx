@@ -4,7 +4,7 @@ import CssBaseline from '@material-ui/core/CssBaseline';
 import Calendar from './components/calendar'
 import MenuAppBar from './components/appbar';
 import CourseTable from './components/courseTable';
-import DaysOfTheWeek, { Checkbox } from './components/daysOfTheWeek';
+import DaysOfTheWeek from './components/daysOfTheWeek';
 import { DAYS_MAP } from './constants/calendarData';
 import { CourseInfo } from './schema';
 import { buildScheduleData, scheduleConverter } from './schema';
