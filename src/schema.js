@@ -1,16 +1,16 @@
 export class CourseInfo {
   constructor(name, credits, startTime, endTime, days, isDisplayed) {
-      this.name = name;
-      this.credits = credits;
-      this.startTime = startTime;
-      this.endTime = endTime;
-      this.days = days;
-      this.isDisplayed = isDisplayed;
+    this.name = name;
+    this.credits = credits;
+    this.startTime = startTime;
+    this.endTime = endTime;
+    this.days = days;
+    this.isDisplayed = isDisplayed;
   }
 
   static changeIsDisplayed(courseInfo, isDisplayed) {
-      return new CourseInfo(courseInfo.name, courseInfo.credits, courseInfo.startTime,
-                            courseInfo.endTime, courseInfo.days, isDisplayed);
+    return new CourseInfo(courseInfo.name, courseInfo.credits, courseInfo.startTime,
+                          courseInfo.endTime, courseInfo.days, isDisplayed);
   }
 
   toData() {
@@ -27,10 +27,10 @@ export class CourseInfo {
 
 export class Schedule {
   constructor(name, id, uid, courseList) {
-      this.name = name;
-      this.id = id;
-      this.uid = uid;
-      this.courseList = courseList;
+    this.name = name;
+    this.id = id;
+    this.uid = uid;
+    this.courseList = courseList;
   }
 }
 
