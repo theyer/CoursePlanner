@@ -123,7 +123,7 @@ class App extends React.Component {
 
   handleDisplayChange(e) {
     const index = parseInt(e.target.id.split("_")[1]);
-    let newCourseInfoList = this.state.courseInfoList;
+    let newCourseInfoList = [...this.state.courseInfoList];
     const newCourseInfo = CourseInfo.changeIsDisplayed(newCourseInfoList[index], e.target.checked);
     newCourseInfoList[index] = newCourseInfo;
     this.setState({ courseInfoList: newCourseInfoList });
@@ -132,6 +132,18 @@ class App extends React.Component {
   addCourse(courseInfo) {
     this.setState(state => ({
       courseInfoList: state.courseInfoList.concat(courseInfo),
+    }));
+  }
+
+  deleteCourse(deleteIndex) {
+    if (this.state.courseInfoList.length <= 1) {
+      this.clearSchedule();
+      return;
+    }
+    this.setState(state => ({
+      courseInfoList: state.courseInfoList.filter((_, index) => {
+        return index !== deleteIndex;
+      }),
     }));
   }
 
@@ -160,6 +172,7 @@ class App extends React.Component {
           days={courseInfo.days}
           isDisplayed={courseInfo.isDisplayed}
           handleDisplayChange={this.handleDisplayChange}
+          handleDelete={() => {this.deleteCourse(i)}}
         />
       );
     }

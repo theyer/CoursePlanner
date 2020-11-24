@@ -1,5 +1,7 @@
 import React from 'react';
 import DaysOfTheWeek, { Checkbox } from './daysOfTheWeek';
+import IconButton from '@material-ui/core/IconButton';
+import DeleteTwoToneIcon from '@material-ui/icons/DeleteTwoTone';
 
 export default class CourseTable extends React.Component {
   constructor(props) {
@@ -21,12 +23,13 @@ export default class CourseTable extends React.Component {
               <th>Start Time</th>
               <th>End Time</th>
               <th>Days</th>
+              <th></th>  {/*Delete button column.*/}
             </tr>
           </thead>
           <tbody>
             {this.props.courseRows}
             <tr className="course_row">
-              <td colSpan="6">Credits: {this.props.numCredits}</td>
+              <td colSpan="7">Credits: {this.props.numCredits}</td>
             </tr>
           </tbody>
         </table>
@@ -61,6 +64,12 @@ export class CourseRow extends React.Component {
                            days={this.props.days}
                            disabled={true}
                            handleChange={this.handleDaysChange} /></td>
+        <td>
+          <IconButton onClick={this.props.handleDelete}
+                      style={{ 'padding': '1px' }}>
+            <DeleteTwoToneIcon fontSize='small'/>
+          </IconButton>
+        </td>
       </tr>
     );
   }
