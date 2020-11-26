@@ -6,7 +6,9 @@
   "scripts": {
     "dev": "webpack-dev-server --mode development",
     "build": "webpack --mode production",
-    "clean": "rm -rf public/dist"
+    "clean": "rm -rf public/dist",
+    "serve": "firebase serve --only hosting",
+    "dryrun": "rm -rf public/dist && webpack --mode production && firebase serve --only hosting"
   },
   "repository": {
     "type": "git",
@@ -41,7 +43,6 @@
     "@babel/preset-react": "^7.0.0",
     "babel-loader": "^8.0.2",
     "css-loader": "^1.0.0",
-    "html-webpack-plugin": "^4.5.0",
     "node-sass": "^4.13.1",
     "sass-loader": "^8.0.2",
     "style-loader": "^0.23.0",
